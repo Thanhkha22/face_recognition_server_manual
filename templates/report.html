@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Báo Cáo Tổng Hợp</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    .chart-container { width: 80%; margin: auto; }
+    canvas { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Báo Cáo Tổng Hợp</h1>
+  <div class="chart-container">
+    <canvas id="dailyChart" width="400" height="200"></canvas>
+  </div>
+  <div class="chart-container">
+    <canvas id="inOutChart" width="400" height="200"></canvas>
+  </div>
+  
+  <script>
+    async function getDailyCounts() {
+      const response = await fetch('/report/daily_counts');
+      return await response.json();
+    }
+    
+    async function getInOutCounts() {
+      const response = await fetch('/report/in_out_counts');
+      return await response.json();
+    }
+    
+    async function renderCharts() {
+      // Biểu đồ số lần nhận diện theo ngày
+      const dailyData = await getDailyCounts();
+      const dailyLabels = dailyData.map(item => item.day);
+      const dailyCounts = dailyData.map(item => item.count);
+
+      const ctxDaily = document.getElementById('dailyChart').getContext('2d');
+      new Chart(ctxDaily, {
+        type: 'bar',
+        data: {
+          labels: dailyLabels,
+          datasets: [{
+            label: 'Số lần nhận diện theo ngày',
+            data: dailyCounts,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+          }]
+        }
+      });
+
+      // Biểu đồ số người ra vào theo event_type
+      const inOutData = await getInOutCounts();
+      const inOutLabels = Object.keys(inOutData);
+      const inOutCounts = Object.values(inOutData);
+
+      const ctxInOut = document.getElementById('inOutChart').getContext('2d');
+      new Chart(ctxInOut, {
+        type: 'pie',
+        data: {
+          labels: inOutLabels,
+          datasets: [{
+            label: 'Số người ra vào',
+            data: inOutCounts,
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.6)',  // màu cho "vào"
+              'rgba(255, 99, 132, 0.6)'   // màu cho "ra"
+            ]
+          }]
+        }
+      });
+    }
+    
+    renderCharts();
+  </script>
+</body>
+</html>

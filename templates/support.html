@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hỗ Trợ Kỹ Thuật</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+
+    /* Header */
+    header { background-color: #004080; color: #fff; padding: 10px 20px; text-align: center; }
+    header img { height: 50px; margin-right: 10px; vertical-align: middle; }
+
+    /* Navigation */
+    nav { background-color: #0066cc; padding: 10px 20px; }
+    nav ul { list-style: none; display: flex; justify-content: center; }
+    nav ul li { margin: 0 15px; }
+    nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+
+    /* Main Container */
+    .container { width: 90%; max-width: 800px; margin: 20px auto; background-color: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+
+    /* Contact Info */
+    .support-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 16px; }
+
+    /* Form Styles */
+    .support-form { text-align: left; }
+    label { display: block; font-weight: bold; margin: 10px 0 5px; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    button { background-color: #004080; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+    button:hover { background-color: #003366; }
+
+    /* Footer */
+    footer { background-color: #004080; color: #fff; text-align: center; padding: 15px; font-size: 14px; margin-top: 20px; }
+  </style>
+
+  <script>
+    async function submitSupportRequest() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const message = document.getElementById("message").value;
+
+      if (!name || !email || !message) {
+        alert("Vui lòng điền đầy đủ thông tin!");
+        return;
+      }
+
+      // Gửi dữ liệu lên server
+      const response = await fetch('/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      if (response.ok) {
+        alert("Yêu cầu hỗ trợ của bạn đã được gửi thành công!");
+        document.getElementById("support-form").reset();
+      } else {
+        alert("Gửi yêu cầu thất bại. Vui lòng thử lại!");
+      }
+    }
+  </script>
+
+<script>
+  async function submitSupportRequest() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const message = document.getElementById("message").value;
+
+    if (!name || !email || !message) {
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
+    try {
+      const response = await fetch('/send_support_email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("✅ Gửi yêu cầu hỗ trợ thành công!");
+        document.getElementById("support-form").reset();
+      } else {
+        alert("❌ Lỗi: " + result.error);
+      }
+    } catch (error) {
+      alert("❌ Gửi yêu cầu thất bại! Vui lòng thử lại.");
+    }
+  }
+</script>
+
+</head>
+<body>
+  {% include "header.html" %}
+  <main>
+ 
+
+  <!-- Main Content -->
+  <div class="container">
+    <section class="support-info">
+      <h2>Liên hệ thành viên nhóm</h2>
+      <ul>
+        <li><strong>Phạm Thanh Khả</strong> - khapt.22th@sv.dla.edu.vn</li>
+        <li><strong>Ngô Trọng Phúc</strong> - phucnt.22th@sv.dla.edu.vn</li>
+      </ul>
+      <p style="padding-top: 8px;">Nếu bạn gặp sự cố, vui lòng liên hệ qua email trên.</p>
+    </section>
+
+    <section class="support-form">
+      <h2>Gửi yêu cầu hỗ trợ</h2>
+      <form id="support-form">
+        <label for="name">Tên của bạn:</label>
+        <input type="text" id="name" placeholder="Nhập tên của bạn">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" placeholder="Nhập email của bạn">
+
+        <label for="message">Nội dung hỗ trợ:</label>
+        <textarea id="message" rows="4" placeholder="Nhập nội dung bạn cần hỗ trợ"></textarea>
+
+        <button type="button" onclick="submitSupportRequest()">Gửi yêu cầu</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  {% include "footer.html" %}
+</main>
+</body>
+</html>

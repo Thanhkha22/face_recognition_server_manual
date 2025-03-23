@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Cài Đặt Hệ Thống</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+    
+    /* Header */
+    header { background-color: #004080; color: #fff; padding: 10px 20px; text-align: center; }
+    header img { height: 50px; margin-right: 10px; vertical-align: middle; }
+    
+    
+
+       /* Contact Info */
+    .support-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 16px; }
+
+    /* Main Container */
+    .container { width: 50%; max-width: 300px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+    
+    /* Form Styles */
+    label { display: block; font-weight: bold; margin: 10px 0 5px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    button { background-color: #004080; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+    button:hover { background-color: #003366; }
+    
+    /* Status Message */
+    #statusMessage { margin-top: 10px; font-weight: bold; }
+
+   
+  </style>
+  <script>
+    async function saveSettings() {
+      const thresholdInput = document.getElementById("threshold");
+      const statusMessage = document.getElementById("statusMessage");
+      const threshold = parseFloat(thresholdInput.value);
+      
+      // Kiểm tra giá trị hợp lệ
+      if (isNaN(threshold) || threshold < 0.0 || threshold > 1.0) {
+        statusMessage.style.color = "red";
+        statusMessage.innerText = "⚠️ Vui lòng nhập giá trị hợp lệ trong khoảng 0.0 - 1.0!";
+        return;
+      }
+      
+      statusMessage.style.color = "blue";
+      statusMessage.innerText = "⏳ Đang lưu cài đặt...";
+      
+      try {
+        const response = await fetch('/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ threshold: threshold })
+        });
+        
+        if (response.ok) {
+          statusMessage.style.color = "green";
+          statusMessage.innerText = "✅ Cài đặt đã được lưu thành công!";
+        } else {
+          statusMessage.style.color = "red";
+          statusMessage.innerText = "❌ Lưu cài đặt thất bại. Vui lòng thử lại!";
+        }
+      } catch (error) {
+        statusMessage.style.color = "red";
+        statusMessage.innerText = "❌ Lỗi kết nối đến server!";
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Header -->
+ 
+
+  
+{% include "header.html" %}
+
+  <!-- Main Content -->
+  <div class="container" style="width: 500px">
+    <h2>Chỉnh Sửa Cài Đặt</h2>
+    
+    <label for="threshold">Ngưỡng Nhận Diện (0.0 - 1.0):</label>
+    <input type="number" id="threshold" step="0.01" min="0.0" max="1.0" value="0.5">
+    
+    <button onclick="saveSettings()">Lưu Cài Đặt</button>
+    <p id="statusMessage"></p>
+  </div>
+
+  <!-- Footer -->
+  {% include "footer.html" %}
+</body>
+</html>

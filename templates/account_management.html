@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản Lý Tài Khoản</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+    .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 10px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .action-buttons a { margin-right: 10px; color: #004080; text-decoration: none; font-weight: bold; cursor: pointer; }
+    .action-buttons a:hover { text-decoration: underline; }
+    .form-container { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; }
+    form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    form input, form select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    form button { padding: 10px 15px; background-color: #004080; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    form button:hover { background-color: #003366; }
+    .hidden { display: none; }
+    
+    h1{
+      color: #f9f9f9;
+    }
+   
+    .button-custom {
+    background-color: #004080;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  .button-custom:hover {
+    background-color: #003366;
+  }
+  </style>
+</head>
+<body>
+  <main>
+    {% include "header.html" %}
+
+  <div class="container">
+   
+    
+    <!-- Bảng danh sách tài khoản -->
+    <h2>Danh Sách Tài Khoản</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên đăng nhập</th>
+          <th>Mật khẩu</th>
+          <th>Vai trò</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.password }}</td>
+          <td>{{ user.role }}</td>
+          <td class="action-buttons">
+            <a href="{{ url_for('edit_account', user_id=user.id) }}">Sửa</a>
+            <a href="{{ url_for('delete_account', user_id=user.id) }}"
+               onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">Xóa</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Nút kích hoạt form thêm tài khoản -->
+    <div style="margin-top: 20px; text-align: right;">
+      <button onclick="toggleForm('add-form')" class="button-custom">Thêm Tài Khoản Mới</button>
+    </div>
+    
+    <!-- Form thêm tài khoản (ẩn/hiện) -->
+    <div id="add-form" class="form-container hidden">
+      <h2>Thêm Tài Khoản</h2>
+      <form action="{{ url_for('add_account') }}" method="POST">
+        <input type="text" name="username" placeholder="Tên đăng nhập" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <select name="role" required>
+          <option value="">Chọn vai trò</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+        <button type="submit">Thêm</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleForm(formId) {
+      var form = document.getElementById(formId);
+      if(form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+      } else {
+        form.classList.add('hidden');
+      }
+    }
+  </script>
+  {% include "footer.html" %}
+ </main>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<html>
+    <header>
+        <style>
+/* Reset & Base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+    
+    /* Header */
+    header { background-color: #0707f6; color: #fff; padding: 10px 20px; text-align: center; }
+    header img { height: 50px; margin-right: 10px; }
+    
+    /* Navigation */
+    nav { background-color: #0066cc; padding: 10px 20px; }
+    nav ul { list-style: none; display: flex; justify-content: center; }
+    nav ul li { margin: 0 15px; }
+    nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+
+    /* Contact Info */
+    .support-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 16px; }
+    
+    /* Container */
+    .container { width: 90%; max-width: 1200px; margin: 20px auto; background-color: #fff; padding: 20px; border: 1px solid #ddd; }
+    
+    /* Live Feed Section */
+    .live-feed { border: 2px dashed #999; padding: 40px; text-align: center; margin-bottom: 20px; background-color: #e6e6e6; }
+    
+    /* Stats Section */
+    .stats { border: 1px solid #ccc; padding: 20px; background-color: #fafafa; margin-bottom: 20px; }
+    .stats h2 { margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    .stats p { margin: 8px 0; }
+    .stats ul { list-style: none; padding-left: 20px; }
+    .stats li { margin-bottom: 5px; }
+    
+    /* Face Info Section */
+    .face-info { border: 1px solid #ccc; padding: 20px; background-color: #fff; margin-bottom: 20px; }
+    .face-info h2 { margin-bottom: 10px; }
+    .face-info img { width: 200px; height: auto; display: block; margin-bottom: 10px; }
+    .face-info form { display: flex; flex-direction: column; }
+    .face-info form label { margin: 5px 0; }
+    .face-info form input, .face-info form select { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    .face-info form button { width: 150px; padding: 10px; background-color: #004080; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    
+    /* Footer */
+    footer { background-color: #004080; color: #fff; text-align: center; padding: 15px; font-size: 14px; }
+
+     /* Container chứa flash message được định vị fixed */
+  .flash-container {
+    position: fixed;
+    top: 20px;         /* Cách lề trên 20px */
+    left: 50%;         /* Canh giữa theo chiều ngang */
+    transform: translateX(-50%);
+    z-index: 9999;     /* Đảm bảo nằm trên cùng */
+  }
+
+  .flash-message {
+    padding: 10px 20px;
+    margin-bottom: 5px;
+    border: 1px solid #c3e6cb;
+    background-color: #d4edda;
+    color: #155724;
+    opacity: 1;
+    transition: opacity 1s ease-out;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .flash-message.fade-out {
+    opacity: 0;
+  }
+        </style>
+    </header>
+    <body>
+        <header style="position: relative;">
+            <img src="/static/img/logo-test1.png" alt="logo">
+                <!-- <h1>Robot Nhận Diện Gương Mặt</h1> -->
+                <h1>Hệ thống nhận diện khuôn mặt</h1>
+                {% if current_user.is_authenticated %}
+            <div style="position: absolute; right: 20px; top: 10px; color: #fff;">
+                Xin chào "{{ current_user.username }}"
+                <a href="{{ url_for('logout') }}" style="color: #fff; text-decoration: none; margin-left: 10px;">Đăng xuất</a>
+            </div>
+                {% endif %}
+        </header>
+        <!-- Hiển thị thông báo flash -->
+   <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  <script>
+    // Sau 3 giây, thêm lớp fade-out cho tất cả flash-message
+    setTimeout(function(){
+      document.querySelectorAll('.flash-message').forEach(function(el){
+        el.classList.add('fade-out');
+      });
+    }, 3000);
+  
+    // Sau 4 giây, ẩn container flash-container
+    setTimeout(function(){
+      var flashContainer = document.querySelector(".flash-container");
+      if(flashContainer) {
+        flashContainer.style.display = 'none';
+      }
+    }, 4000);
+  </script>
+  <nav>
+    <ul>
+      <li><a href="{{ url_for('index') }}">Trang chủ</a></li>
+      <li><a href="{{ url_for('history') }}">Lịch sử</a></li>
+      <!-- <li><a href="{{ url_for('settings') }}">Cài đặt</a></li> -->
+      <li><a href="{{ url_for('support') }}">Hỗ trợ</a></li>
+      <li><a href="{{ url_for('face_management') }}">Quản Lý Khuôn Mặt</a></li>
+      
+      {% if current_user.is_authenticated and current_user.role == "admin" %}
+        <li><a href="{{ url_for('account_management') }}">Quản Lý Tài Khoản</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+    </body>
+</html>
+
