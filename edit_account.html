@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Tài Khoản</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { text-align: center; }
+        form { display: flex; flex-direction: column; gap: 10px; }
+        input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #004080; color: #fff; cursor: pointer; }
+        button:hover { background-color: #003366; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sửa Tài Khoản</h2>
+        <form action="{{ url_for('edit_account', user_id=user.id) }}" method="POST">
+            <label>Tên đăng nhập:</label>
+            <input type="text" name="username" value="{{ user.username }}" required>
+            <label>Mật khẩu:</label>
+            <input type="password" name="password" placeholder="Nhập mật khẩu mới nếu muốn đổi">
+            <label>Vai trò:</label>
+            <select name="role" required>
+                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+            </select>
+            <button type="submit">Cập Nhật</button>
+        </form>
+        <p style="text-align: left; margin-top: 10px;">
+            <a href="{{ url_for('account_management') }}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #004080; color: white; 
+                      text-decoration: none; border-radius: 5px; font-weight: bold;">
+                 Quay lại
+            </a>
+        </p>
+        
+    </div>
+</body>
+</html>

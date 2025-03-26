@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch Sử Nhận Diện</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    /* CSS cơ bản */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+    header { background-color: #004080; color: #fff; padding: 10px 20px; text-align: center; }
+    nav { background-color: #0066cc; padding: 10px 20px; }
+    nav ul { list-style: none; display: flex; justify-content: center; }
+    nav ul li { margin: 0 15px; }
+    nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+    
+    .container { 
+      width: 90%; 
+      max-width: 1200px; 
+      margin: 20px auto; 
+      background-color: #fff; 
+      padding: 20px; 
+      border: 1px solid #ddd; 
+    }
+    
+    /* Sử dụng Flexbox để sắp xếp bảng và form chỉnh sửa theo hàng */
+    .content-wrapper {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .table-wrapper {
+      flex: 2;
+    }
+    .edit-container {
+      flex: 1;
+      margin-top: 0; /* Bỏ margin-top vì form sẽ đặt bên cạnh bảng */
+    }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #0066cc; color: white; }
+    td.image-cell { text-align: center; }
+    td.info-cell { text-align: left; }
+    footer { background-color: #004080; color: #fff; text-align: center; padding: 15px; font-size: 14px; }
+    
+    /* Nút Xóa nhiều mục */
+    .bulk-delete-btn {
+      background-color: #d9534f;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .bulk-delete-btn:hover {
+      background-color: #c9302c;
+    }
+    
+    /* Form chỉnh sửa */
+    .edit-container h3 {
+      margin-bottom: 15px;
+      color: #004080;
+    }
+    .edit-container .form-group {
+      margin-bottom: 15px;
+    }
+    .edit-container label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .edit-container input, 
+    .edit-container select {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .edit-container button, .delete-btn {
+      background-color: #004080;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .edit-container button:hover {
+      background-color: #003366;
+    }
+    .edit-btn {
+      background: linear-gradient(45deg, #ff9800, #f57c00);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .edit-btn:hover {
+      background: linear-gradient(45deg, #f57c00, #e65100);
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .delete-btn {
+      background-color: #d9534f;
+    }
+    .delete-btn:hover {
+      background-color: #c9302c;
+    }
+  </style>
+  <script>
+    // Lấy dữ liệu lịch sử từ endpoint /get_history
+    async function fetchHistory() {
+      try {
+        const response = await fetch('/get_history');
+        if (!response.ok) {
+          throw new Error(`Lỗi kết nối: ${response.status}`);
+        }
+        const data = await response.json();
+        const tableBody = document.getElementById('history-table-body');
+        tableBody.innerHTML = '';
+        
+        if (data.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="9">Không có dữ liệu</td></tr>';
+          return;
+        }
+        
+        data.forEach(entry => {
+          // recognized_faces chứa face_id, name, dob, gender, face_image
+          const recognized = entry.recognized_faces;
+          let row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${entry.id || 'N/A'}</td>
+            <td><input type="checkbox" class="select-event" value="${entry.id}"></td>
+            <td class="image-cell">
+              ${ recognized.face_image ? `<img src="${recognized.face_image}" alt="Ảnh khuôn mặt" style="width:80px; height:auto;" onerror="this.onerror=null;this.src='/static/default-face.png';">` 
+                : `<img src="/static/default-face.png" alt="Ảnh khuôn mặt" style="width:80px; height:auto;">` }
+            </td>
+            <td class="info-cell">${recognized.name || 'N/A'}</td>
+            <td>${recognized.dob || 'N/A'}</td>
+            <td>${recognized.gender || 'N/A'}</td>
+            <td>${entry.event_type || 'Nhận diện'}</td>
+            <td>
+              <button class="edit-btn" onclick="loadForEdit('${entry.id}', '${recognized.face_id}', '${recognized.name}', '${recognized.dob}', '${recognized.gender}', '${entry.event_type}', '${recognized.face_image}')">Sửa</button>
+            </td>
+            <td>
+              <button class="delete-btn" onclick="deleteEvent('${entry.id}')">Xóa</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Lỗi khi tải lịch sử:", error);
+      }
+    }
+
+    // Hàm load dữ liệu của 1 sự kiện vào form chỉnh sửa
+    function loadForEdit(eventId, faceId, name, dob, gender, eventType, faceImage) {
+      document.getElementById('edit-event-id').value = eventId;
+      document.getElementById('edit-face-id').value = faceId;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-dob').value = dob;
+      document.getElementById('edit-gender').value = gender;
+      // Gán giá trị cho thẻ select (vô hiệu) và input ẩn
+      document.getElementById('edit-event-type').value = eventType;
+      document.getElementById('hidden-event-type').value = eventType;
+      document.getElementById('edit-face-image').value = faceImage;
+    }
+
+    // Hàm cập nhật thông tin sự kiện
+    async function updateEvent() {
+      const eventId = document.getElementById('edit-event-id').value;
+      const faceId = document.getElementById('edit-face-id').value;
+      const name = document.getElementById('edit-name').value;
+      const dob = document.getElementById('edit-dob').value;
+      const gender = document.getElementById('edit-gender').value;
+      // Lấy giá trị "Hành động" từ input ẩn
+      const eventType = document.getElementById('hidden-event-type').value;
+      const faceImage = document.getElementById('edit-face-image').value;
+      
+      if (!eventId) {
+        alert("Không có sự kiện nào được chọn để cập nhật!");
+        return;
+      }
+      
+      const payload = {
+        id: eventId,
+        recognized_faces: {
+          face_id: faceId,
+          name: name,
+          dob: dob,
+          gender: gender,
+          face_image: faceImage  // Gửi thêm thông tin hình ảnh
+        },
+        event_type: eventType
+      };
+      
+      try {
+        const response = await fetch('/update_event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert("Cập nhật thành công!");
+          fetchHistory(); // Load lại danh sách sau khi cập nhật
+        } else {
+          alert("Cập nhật thất bại: " + result.error);
+        }
+      } catch (error) {
+        console.error("Lỗi khi cập nhật:", error);
+        alert("Lỗi khi cập nhật thông tin.");
+      }
+    }
+
+    // Hàm xóa sự kiện theo ID
+    async function deleteEvent(eventId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa sự kiện này?")) return;
+      
+      try {
+        const response = await fetch(`/delete_event/${eventId}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (response.ok) {
+          alert("Xóa sự kiện thành công!");
+          fetchHistory();
+        } else {
+          alert("Xóa thất bại: " + result.error);
+        }
+      } catch (error) {
+        console.error("Lỗi khi xóa sự kiện:", error);
+        alert("Lỗi khi xóa sự kiện.");
+      }
+    }
+    
+    // Hàm xóa nhiều sự kiện đã chọn
+    async function deleteSelectedEvents() {
+      const selectedCheckboxes = document.querySelectorAll('.select-event:checked');
+      if (selectedCheckboxes.length === 0) {
+        alert("Vui lòng chọn ít nhất 1 sự kiện để xóa.");
+        return;
+      }
+      if (!confirm("Bạn có chắc chắn muốn xóa các sự kiện đã chọn?")) return;
+      
+      const deletePromises = [];
+      selectedCheckboxes.forEach(cb => {
+        const eventId = cb.value;
+        deletePromises.push(
+          fetch(`/delete_event/${eventId}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(result => {
+              if (!result.error) return true;
+              else {
+                console.error(`Xóa sự kiện ${eventId} thất bại: ${result.error}`);
+                return false;
+              }
+            })
+            .catch(error => {
+              console.error(`Lỗi khi xóa sự kiện ${eventId}:`, error);
+              return false;
+            })
+        );
+      });
+      
+      const results = await Promise.all(deletePromises);
+      if (results.every(success => success)) {
+        alert("Xóa các sự kiện đã chọn thành công!");
+      } else {
+        alert("Một số sự kiện không thể xóa. Vui lòng thử lại.");
+      }
+      fetchHistory();
+    }
+
+    window.addEventListener('load', fetchHistory);
+  </script>
+</head>
+<body>
+  <main>
+    {% include "header.html" %}
+    <div class="container">
+      <div class="content-wrapper">
+        <!-- Phần bảng Danh sách nhận diện -->
+        <div class="table-wrapper">
+          <h2>Danh sách nhận diện (Bảng Events)</h2>
+          <!-- Nút xóa nhiều mục -->
+          <button class="bulk-delete-btn" onclick="deleteSelectedEvents()">Xóa mục đã chọn</button>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Chọn</th>
+                <th>Ảnh</th>
+                <th>Tên</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Hành động</th>
+                <th>Chỉnh sửa</th>
+                <th>Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr><td colspan="9">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Phần Form chỉnh sửa sự kiện bên phải -->
+        <div class="edit-container">
+          <h3>Chỉnh sửa thông tin sự kiện</h3>
+          <div class="form-group">
+            <label for="edit-event-id">ID Sự kiện:</label>
+            <input type="text" id="edit-event-id" name="edit-event-id" readonly>
+          </div>
+          <div class="form-group">
+            <label for="edit-face-id">Mã khuôn mặt:</label>
+            <input type="text" id="edit-face-id" name="edit-face-id" readonly>
+            <!-- Input ẩn để lưu đường dẫn hình ảnh -->
+            <input type="hidden" id="edit-face-image" name="edit-face-image">
+          </div>
+          <div class="form-group">
+            <label for="edit-name">Tên:</label>
+            <input type="text" id="edit-name" name="edit-name">
+          </div>
+          <div class="form-group">
+            <label for="edit-dob">Ngày sinh:</label>
+            <input type="date" id="edit-dob" name="edit-dob">
+          </div>
+          <div class="form-group">
+            <label for="edit-gender">Giới tính:</label>
+            <select id="edit-gender" name="edit-gender">
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Khác">Khác</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-event-type">Hành động:</label>
+            <!-- Select này được disable để không cho chỉnh sửa -->
+            <select id="edit-event-type" name="edit-event-type" disabled>
+              <option value="Vào">Vào</option>
+              <option value="Ra">Ra</option>
+            </select>
+            <!-- Input ẩn lưu giá trị hành động để gửi lên server -->
+            <input type="hidden" id="hidden-event-type" name="hidden-event-type">
+          </div>
+          <button type="button" onclick="updateEvent()">Cập nhật</button>
+        </div>
+      </div>
+    </div>
+    {% include "footer.html" %}
+  </main>
+  <script>
+    document.querySelectorAll('.edit-container input, .edit-container select').forEach(input => {
+  input.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      updateEvent();
+    }
+  });
+});
+  </script>
+</body>
+</html>

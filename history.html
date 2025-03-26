@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch Sử Nhận Diện</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+    header { background-color: #004080; color: #fff; padding: 10px 20px; text-align: center; }
+    nav { background-color: #0066cc; padding: 10px 20px; }
+    nav ul { list-style: none; display: flex; justify-content: center; }
+    nav ul li { margin: 0 15px; }
+    nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+    
+    .container { 
+      width: 90%; 
+      max-width: 1200px; 
+      margin: 20px auto; 
+      background-color: #fff; 
+      padding: 20px; 
+      border: 1px solid #ddd; 
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #0066cc; color: white; }
+    footer { background-color: #004080; color: #fff; text-align: center; padding: 15px; font-size: 14px; }
+  </style>
+  <script>
+    async function fetchHistory() {
+      try {
+        // Lấy dữ liệu từ endpoint /get_history (dữ liệu từ bảng events)
+        const response = await fetch('/get_history');
+        if (!response.ok) {
+          throw new Error(`Lỗi kết nối: ${response.status}`);
+        }
+        const data = await response.json();
+        const tableBody = document.getElementById('history-table-body');
+        tableBody.innerHTML = '';
+        
+        if (data.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="4">Không có dữ liệu</td></tr>';
+          return;
+        }
+        
+        data.forEach(entry => {
+          // recognized_faces là đối tượng chứa thông tin khuôn mặt được lưu trong bảng events
+          let recognized = entry.recognized_faces;
+          let count = entry.count || 1;
+          let eventType = entry.event_type || "Nhận diện";
+          let faceText = `Mã: ${recognized.face_id || 'N/A'}, Tên: ${recognized.name || 'N/A'}, Ngày sinh: ${recognized.dob || 'N/A'}, Giới tính: ${recognized.gender || 'N/A'}`;
+          let row = `<tr>
+            <td>${entry.timestamp}</td>
+            <td style="text-align: left;">${faceText}</td>
+            <td>${count}</td>
+            <td>${eventType}</td>
+          </tr>`;
+          tableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error("Lỗi khi tải lịch sử:", error);
+      }
+    }
+    
+    window.addEventListener('load', fetchHistory);
+  </script>
+</head>
+<body>
+  <main>
+    {% include "header.html" %}
+    <div class="container">
+      <h2>Danh sách nhận diện</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Thời gian</th>
+            <th>Thông tin khuôn mặt</th>
+            <th>Số lượng</th>
+            <th>Sự kiện</th>
+          </tr>
+        </thead>
+        <tbody id="history-table-body">
+          <tr><td colspan="4">Đang tải dữ liệu...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    {% include "footer.html" %}
+  </main>
+</body>
+</html>
