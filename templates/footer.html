@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Face Recognition Server</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    /* Reset & Base */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; color: #333; }
+    
+    /* Header */
+    header { background-color: #004080; color: #fff; padding: 10px 20px; text-align: center; }
+    header img { height: 50px; margin-right: 10px; }
+    
+    /* Navigation */
+    nav { background-color: #0066cc; padding: 10px 20px; }
+    nav ul { list-style: none; display: flex; justify-content: center; }
+    nav ul li { margin: 0 15px; }
+    nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+
+    /* Contact Info */
+    .support-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 16px; }
+    
+    /* Container */
+    .container { width: 90%; max-width: 1200px; margin: 20px auto; background-color: #fff; padding: 20px; border: 1px solid #ddd; }
+    
+    /* Live Feed Section */
+    .live-feed { border: 2px dashed #999; padding: 40px; text-align: center; margin-bottom: 20px; background-color: #e6e6e6; }
+    
+    /* Stats Section */
+    .stats { border: 1px solid #ccc; padding: 20px; background-color: #fafafa; margin-bottom: 20px; }
+    .stats h2 { margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    .stats p { margin: 8px 0; }
+    .stats ul { list-style: none; padding-left: 20px; }
+    .stats li { margin-bottom: 5px; }
+    
+    /* Face Info Section */
+    .face-info { border: 1px solid #ccc; padding: 20px; background-color: #fff; margin-bottom: 20px; }
+    .face-info h2 { margin-bottom: 10px; }
+    .face-info img { width: 200px; height: auto; display: block; margin-bottom: 10px; }
+    .face-info form { display: flex; flex-direction: column; }
+    .face-info form label { margin: 5px 0; }
+    .face-info form input, .face-info form select { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    .face-info form button { width: 150px; padding: 10px; background-color: #004080; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    
+    /* Footer */
+    footer { background-color: #004080; color: #fff; text-align: center; padding: 15px; font-size: 14px; }
+
+     /* Container chứa flash message được định vị fixed */
+  .flash-container {
+    position: fixed;
+    top: 20px;         /* Cách lề trên 20px */
+    left: 50%;         /* Canh giữa theo chiều ngang */
+    transform: translateX(-50%);
+    z-index: 9999;     /* Đảm bảo nằm trên cùng */
+  }
+
+  .flash-message {
+    padding: 10px 20px;
+    margin-bottom: 5px;
+    border: 1px solid #c3e6cb;
+    background-color: #d4edda;
+    color: #155724;
+    opacity: 1;
+    transition: opacity 1s ease-out;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .flash-message.fade-out {
+    opacity: 0;
+  }
+  </style>
+  
+  
+</head>
+<body>
+
+
+  <footer>
+    <p>[Thông tin liên hệ] | [Hướng dẫn sử dụng]</p>
+  </footer>
+  
+</body>
+</html>
